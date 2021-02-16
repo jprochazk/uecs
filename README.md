@@ -24,6 +24,6 @@ The op/s number is the same as the FPS counter in games.
 
 On my machine, the results are:
 
-| CPU                 | operations |
-|: ------------------ |:----------:|
-| i5-8600K @ 3.60 GHz |   ~100/s   |
+CPU                 | operations |
+:------------------ |:----------:|
+i5-8600K @ 3.60 GHz |   ~100/s   |
