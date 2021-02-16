@@ -1,6 +1,24 @@
-on: [push, pull_request]
-
 name: CI
+
+on:
+  push:
+    paths:
+      - .github
+      - src
+      - jest.config.js
+      - rollup.config.js
+      - package.json
+      - package-lock.json
+      - tsconfig.json
+  pull_request:
+    paths:
+      - .github
+      - src
+      - jest.config.js
+      - rollup.config.js
+      - package.json
+      - package-lock.json
+      - tsconfig.json
 
 jobs:
   # runs typescript build + test
