@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "es5" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */,
+        "module": "es6" /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */,
+        "lib": ["ES2017", "ES7", "ES6", "DOM"],
+        "declaration": true,
+        "declarationDir": "./dist",
+        "outDir": "./dist" /* Redirect output structure to the directory. */,
+        "strict": true /* Enable all strict type-checking options. */,
+        "noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
+        "alwaysStrict": true /* Parse in strict mode and emit "use strict" for each source file. */,
+        "baseUrl": "./src" /* Base directory to resolve non-absolute module names. */,
+        //"types": [],
+        "esModuleInterop": true, /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+        "moduleResolution": "node",
+        "downlevelIteration": true,
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"]
+}
