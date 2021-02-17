@@ -49,11 +49,11 @@ function physics(world) {
 
 Here are the core concepts of the library:
 
-**Entity:** an opaque identifier. Entities are used to retrieve components from storage - simply put, it's an array index.
-**Component:** - some state. Components store all your data. In *μECS*, components are plain ES6 classes.
-**System:** - some logic. Systems house your game rules. It's a bit of code which accesses some entities and components, modifies them, creates new ones, destroys them, and so on.
-**World:** - a container. It manages entity and component lifetimes and allows you to flexibly and efficiently utilise them.
-**View:** - a query. A non-owning container of components. They are what makes this library fast.
+* **Entity:** an opaque identifier. Entities are used to retrieve components from storage - simply put, it's an array index.
+* **Component:** - some state. Components store all your data. In *μECS*, components are plain ES6 classes.
+* **System:** - some logic. Systems house your game rules. It's a bit of code which accesses some entities and components, modifies them, creates new ones, destroys them, and so on.
+* **World:** - a container. It manages entity and component lifetimes and allows you to flexibly and efficiently utilise them.
+* **View:** - a query. A non-owning container of components. They are what makes this library fast.
 
 Every part of the API surface is thoroughly documented, together with comprehensive examples.
 
