@@ -164,10 +164,10 @@ export class World {
 
     /**
      * Sets `entity`'s instance of component `type` to `component`.
-     * 
      * @throws If `entity` does not exist
      * 
-     * **Warning:** Overwrites any existing instance of the component!
+     * 
+     * Warning: Overwrites any existing instance of the component.
      * This is to avoid an unnecessary check in 99% of cases where the
      * entity does not have the component yet. Use `world.has` to 
      * check for the existence of the component first, if this is undesirable.
@@ -270,19 +270,17 @@ export class World {
      * 
      * Example:
      * ```
-     *  class A {}
-     *  class B {}
-     *  class C {}
+     *  class Fizz { }
+     *  class Buzz { }
      *  const world = new World();
-     * 
      *  for (let i = 0; i < 100; ++i) {
-     *      if (i % 3 === 0 && i % 5 === 0) world.create(new A, new B, new C)
-     *      else if (i % 3 === 0) world.create(new A, new B);
-     *      else if (i % 5 === 0) world.create(new B, new C);
+     *      const entity = world.create();
+     *      if (i % 3 === 0) world.emplace(entity, new Fizz);
+     *      if (i % 5 === 0) world.emplace(entity, new Buzz);
      *  }
      * 
-     *  world.view(A, B, C).each((n) => {
-     *      console.log(`${n} => FizzBuzz`);
+     *  world.view(Fizz, Buzz).each((n) => {
+     *      console.log(`FizzBuzz! (${n})`);
      *  });
      * ```
      */

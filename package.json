@@ -31,7 +31,8 @@
         "test": "jest",
         "build": "rollup -c",
         "prepare": "npm run build",
-        "build-docs": "typedoc src/index.ts --readme none --out docs/generated"
+        "build-docs": "typedoc src/index.ts --readme none --out docs/generated",
+        "lint": "eslint"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^15.1.0",
