@@ -120,11 +120,86 @@ To see an actual example, visit the [docs](./docs).
 
 You can see the library in usage [here](https://github.com/EverCrawl/game/blob/master/client/src/core/game/System.ts).
 
+#### Other notable features:
+
+**Tags**
+```ts
+import { World, Tag } from "uecs";
+
+const world = new World;
+
+// Tags work similarly to JS Symbols.
+
+// They create a unique stateless type,
+// which you can use to augment entities
+// with additional identification.
+
+world.create(Tag.for("Player"));
+world.create(Tag.for("Enemy"));
+
+world.view(Tag.for("Enemy")).each((entity) => { /* ... */ });
+world.view(Tag.for("Player")).each((entity) => { /* ... */ });
+```
+
+**Inserting entities**
+```ts
+import { World, Tag, Component } from "uecs";
+
+let world = new World;
+// Insert an entity with a specific ID
+// This is useful for serialization or networking,
+// where you don't want the entity IDs to change
+// across different runs or machines.
+world.insert(10);
+```
+
+#### Advanced usage
+
+**Simple serialization**
+```js
+class Thing { constructor(value) { this.value = value; } }
+// put it on the global object, so we can retrieve the class by its name later
+globalThis.Thing = Thing;
+
+// Populate world
+let world = new World;
+for (let i = 0; i < 100; ++i) {
+    world.create(new Thing(`entity${i}`));
+}
+
+// Serialize...
+let serialized = {};
+for (const entity of world.all()) {
+    // grab components which you care about
+    serialized[entity] = {
+        Thing: world.get(entity, Thing)
+    }
+}
+
+// Save to a file, send over the network, etc.
+
+let world = new World;
+// Deserialize...
+for (const entity of Object.keys(serialized)) {
+    const components = [];
+    for (const type of Object.keys(serialized[entity])) {
+        // Assuming that the component types exist on the global object,
+        // create an instance of the component from the deserialized properties
+        components.push(Object.create(globalThis[type].prototype, { value: serialized[entity][type] }));
+    }
+    // And insert it into the world
+    world.insert(parseInt(entity), ...components);
+}
+```
+
 ### Benchmark
 
-The benchmark is available [here](https://jsbench.me/1hkl8hiyqh/1).
+Inspired by [ecs_benchmark](https://github.com/abeimler/ecs_benchmark), which benchmarks C++ libraries.
 
-The benchmark attempts to update the (somewhat complex) state of 100k entities. 
+The benchmark is available [here](https://jsbench.me/1hkl8hiyqh/1). It attempts to update the state of 100k entities. 
+
+The update includes doing things like allocating strings, generating random numbers, branching (if statements), and more. It attemps to reflect a *real world* scenario, but it's incredibly difficult to do so.
+
 The op/s number is the same as the FPS counter in games. The example is a bit contrived, because you would probably have a hard time finding a scenario where you'd need to put 100k entities into your game. Nevertheless, this library can probably handle it.
 
 On my machine, the results are:
