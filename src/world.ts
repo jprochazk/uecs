@@ -34,7 +34,7 @@ export class World {
     private entitySequence: Entity = 0;
     private entities: Set<Entity> = new Set;
     private components: TypeStorage<ComponentStorage<Component>> = {};
-    private groups: { [id: string]: View<any> } = {};
+    private views: { [id: string]: View<any> } = {};
 
     /**
      * Creates an entity, and optionally assigns all `components` to it.
@@ -180,7 +180,20 @@ export class World {
      *  const entity = world.create();
      *  world.emplace(entity, new A);
      *  world.get(entity, A).value = 50
-     *  world.remove(entity, A); // => A { value: 50 }
+     *  world.remove(entity, A); // A { value: 50 }
+     *  world.remove(entity, A); // undefined
+     * ```
+     * 
+     * This does **not** call `.free()` on the component. The reason for this is that
+     * you don't always want to free the removed component. You can still free component,
+     * because the `World.remove` method returns it! Example:
+     * ```
+     *  class F { free() { console.log("freed") } }
+     *  const world = new World;
+     *  const entity = world.create(new F);
+     *  world.remove(entity, F).free();
+     *  // you can use optional chaining to easily guard against the 'undefined' case:
+     *  world.remove(entity, F)?.free();
      * ```
      */
     remove<T extends Component>(entity: Entity, component: Constructor<T>): T | undefined {
@@ -212,7 +225,7 @@ export class World {
      * A view is a non-owning container for components.
      * It has a `.each` method, which accepts a callback.
      * The callback is called with each entity in the view,
-     * and the queried components.
+     * and the queried components belonging to the entity.
      * 
      * Example:
      * ```
@@ -237,10 +250,10 @@ export class World {
         for (let i = 0; i < types.length; ++i) {
             id += types[i].name;
         }
-        if (this.groups[id] == null) {
-            this.groups[id] = new View(this, generateView(types));
+        if (this.views[id] == null) {
+            this.views[id] = new View(this, generateView(types));
         }
-        return this.groups[id];
+        return this.views[id];
     }
 
     /**
@@ -260,7 +273,8 @@ export class World {
     }
 }
 
-type ComponentView<T extends Constructor<Component>[]> = (world: World, callback: (entity: Entity, ...components: InstanceTypeTuple<T>) => void) => void;
+type ViewCallback<T extends Constructor<Component>[]> = (entity: Entity, ...components: InstanceTypeTuple<T>) => false | void;
+type ComponentView<T extends Constructor<Component>[]> = (world: World, callback: ViewCallback<T>) => void;
 /**
  * A view is a non-owning container for components.
  * 
@@ -269,7 +283,7 @@ type ComponentView<T extends Constructor<Component>[]> = (world: World, callback
 class View<T extends Constructor<Component>[]> {
     constructor(private world: World, private view: ComponentView<T>) { }
 
-    each(callback: (entity: Entity, ...components: InstanceTypeTuple<T>) => void) {
+    each(callback: ViewCallback<T>) {
         this.view(this.world, callback);
     }
 }
@@ -285,13 +299,13 @@ function generateView(types: any[]): ComponentView<any> {
         varNames.push(varName);
         // note: prefix _$ is used to lower the chance of name collisions
         variables += `var ${varName} = _$world.components["${typeName}"][entity];\n`;
-        variables += `if (${varName} === undefined) continue nextEntity;\n`;
+        variables += `if (${varName} === undefined) continue;\n`;
     }
 
     let fn = "";
-    fn += "nextEntity: for(var entity of _$world.entities.values()) {\n";
+    fn += "for(var entity of _$world.entities.values()) {\n";
     fn += `${variables}`;
-    fn += `_$callback(entity,${join(varNames, ",")});\n`
+    fn += `if (_$callback(entity,${join(varNames, ",")}) === false) return;\n`
     fn += "}";
 
     return new Function("_$world", "_$callback", fn) as any;
