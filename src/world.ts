@@ -10,7 +10,7 @@ export type Entity = number;
  * The Null entity can be used to initialiaze a variable
  * which is meant to hold an entity without actually using `null`.
  */
-export const Null: Entity = -1 >>> 0;
+export const Null: Entity = -1;
 
 /**
  * Stores arbitrary data
@@ -24,6 +24,10 @@ export interface Component {
 // Type aliases for component storage
 interface TypeStorage<T> { [type: string]: T }
 interface ComponentStorage<T> { [entity: number]: T }
+
+// TODO: store entities in Array<Entity> instead of Set<Entity>
+// if an entity is destroyed, set it in the array to -1
+// skip entities marked as -1 in views
 
 /**
  * World is the core of the ECS. 
@@ -54,12 +58,28 @@ export class World {
     /**
      * Inserts the `entity`, and optionally assigns all `components` to it.
      * 
-     * @throws If `entity` already exists.
+     * If the entity already exists, all `components` will be assigned to it.
+     * If it already has some other components, they won't be destroyed:
+     * ```ts
+     *  class A { constructor(value = 0) { this.value = value } }
+     *  class B { constructor(value = 0) { this.value = value } }
+     *  const world = new World;
+     *  const entity = world.create(new A, new B);
+     *  world.get(entity, A); // A { value: 0 }
+     *  world.insert(entity, new A(5));
+     *  world.get(entity, A); // A { value: 5 }
+     *  world.get(entity, B); // B { value: 0 }
+     * ```
+     * 
+     * You can first check if the entity exists, destroy it if so, and then insert it.
+     * ```ts
+     *  if (world.exists(entity)) {
+     *      world.destroy(entity);
+     *  }
+     *  world.insert(entity, new A, new B, ...);
+     * ```
      */
     insert<T extends Component[]>(entity: Entity, ...components: T): Entity {
-        if (this.entities.has(entity)) {
-            throw new Error(`Attempted to insert duplicate entity ${entity}`);
-        }
         this.entities.add(entity);
         for (let i = 0, len = components.length; i < len; ++i) {
             this.emplace(entity, components[i]);
@@ -98,35 +118,32 @@ export class World {
 
 
     /**
-     * Retrieves component of type `type` for `entity`
-     * 
-     * @throws If `entity` does not exist
+     * Retrieves `component` belonging to `entity`. Returns `undefined`
+     * if it the entity doesn't have `component`, or the `entity` doesn't exist.
      * 
      * Example:
      * ```
      *  class A { value = 50 }
+     *  class B {}
      *  const world = new World();
      *  const entity = world.create();
      *  world.emplace(entity, new A);
      *  world.get(entity, A).value; // 50
      *  world.get(entity, A).value = 10;
      *  world.get(entity, A).value; // 10
+     *  world.get(entity, B); // undefined
+     *  world.get(100, A); // undefined
      * ```
      */
     get<T extends Component>(entity: Entity, component: Constructor<T>): T | undefined {
         const type = component.name;
-        // can't get for "dead" entity
-        if (!this.entities.has(entity)) {
-            throw new Error(`Cannot get component "${type}" for dead entity ID ${entity}`);
-        }
-
         const storage = this.components[type];
         if (storage === undefined) return undefined;
         return storage[entity] as T | undefined;
     }
 
     /**
-     * Returns `true` if `entity` has `component`, `false` otherwise.
+     * Returns `true` if `entity` exists AND has `component`, false otherwise.
      * 
      * Example:
      * ```
@@ -136,6 +153,7 @@ export class World {
      *  world.has(entity, A); // false
      *  world.emplace(entity, new A);
      *  world.has(entity, A); // true
+     *  world.has(100, A); // false
      * ```
      */
     has<T extends Component>(entity: Entity, component: Constructor<T>): boolean {
@@ -156,9 +174,28 @@ export class World {
      * 
      * Example:
      * ```
-     *  class A {}
+     *  class A { constructor(value) { this.value = value } }
      *  const entity = world.create();
-     *  world.emplace(entity, new A);
+     *  world.emplace(entity, new A(0));
+     *  world.emplace(entity, new A(5));
+     *  world.get(entity, A); // A { value: 5 } -> overwritten
+     * ```
+     * 
+     * Note: This is the only place in the API where an error will be
+     * thrown in case you try to use a non-existent entity.
+     * 
+     * Here's an example of why it'd be awful if `World.emplace` *didn't* throw:
+     * ```ts
+     *  class A { constructor(value = 0) { this.value = value } }
+     *  const world = new World;
+     *  world.exists(0); // false
+     *  world.emplace(0, new A);
+     *  // entity '0' doesn't exist, but it now has a component.
+     *  // let's try creating a brand new entity:
+     *  const entity = world.create();
+     *  // *BOOM!*
+     *  world.get(0, A); // A { value: 0 }
+     *  // it'd be extremely difficult to track down this bug.
      * ```
      */
     emplace<T extends Component>(entity: Entity, component: T) {
@@ -174,10 +211,8 @@ export class World {
     }
 
     /**
-     * Removes instance of `component` from `entity`, and returns the removed component,
-     * or `undefined` if nothing was removed.
-     * 
-     * @throws If `entity` does not exist
+     * Removes instance of `component` from `entity`, and returns the removed component.
+     * Returns `undefined` if nothing was removed, or if `entity` does not exist.
      * 
      * Example:
      * ```
@@ -191,8 +226,8 @@ export class World {
      * ```
      * 
      * This does **not** call `.free()` on the component. The reason for this is that
-     * you don't always want to free the removed component. You can still free component,
-     * because the `World.remove` method returns it! Example:
+     * you don't always want to free the removed component. Don't fret, you can still 
+     * free component, because the `World.remove` call returns it! Example:
      * ```
      *  class F { free() { console.log("freed") } }
      *  const world = new World;
@@ -225,7 +260,7 @@ export class World {
     }
 
     /**
-     * Used to query for entities with specific components
+     * Used to query for entities with specific component combinations
      * and efficiently iterate over the result.
      * 
      * A view is a non-owning container for components.

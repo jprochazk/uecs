@@ -13,9 +13,9 @@ In fact, because it is so efficient and makes your code so much easier to reason
 
 ### About the library
 
-This library tries to stay unopinionated. Where most ECS libraries act more like engines, dictating how you should structure and run your code, here you'll find only a very efficient storage for your entities and components. How you actually structure your game is entirely up to you.
+*μECS* tries to stay unopinionated. Where most ECS libraries act more like engines, dictating how you should structure and run your code, here you'll find only a very efficient storage for your entities and components. How you actually structure your game is entirely up to you.
 
-To stay lean and mean, things like deferred entity destruction, resource management, component pooling, and so on, are not part of the library. It means there is more work for you, the user, but it also means there is *far* more flexibility for everyone. It doesn't require an exorbitant amount of work, either! You can see examples of advanced usage [further down](#advanced-usage).
+To stay lean and mean, things like deferred entity destruction, resource management, component pooling, and so on, are not part of the library. It means there is more work for you, the user, but it also means there is far more flexibility for *every* user's specific requirements. Rest assured, using the library doesn't require an exorbitant amount of work. Quite the opposite, it's very straightforward. You can see examples of advanced usage [further down](#advanced-usage).
 
 ### Usage
 
@@ -23,80 +23,59 @@ To best illustrate the usage of this library, here's some code:
 
 ```ts
 import { World } from 'uecs';
-// Components are plain classes
-class Position {
-    x = 0,
-    y = 0
-}
-class Velocity {
-    x = 10,
-    y = 10
-}
+
+// Create some components
+class Position { x = 0; y = 0 }
+class Velocity { x = 10; y = 10 }
 class Thing {
     value = "test";
     free() { console.log("freed"); }
 }
 
-// The `World` is the core of this library, everything revolves around it:
+// Create a `World` and add some entities
 const world = new World;
-
-// Here's how you'd add some entities and components:
 for (let i = 0; i < 100; ++i) {
-    // `World.create` accepts a list of components you want this entity to have
-    world.create(new Position, new Velocity, new Thing, new Freeable);
-    // This is the same as doing:
-    const entity = world.create();
-    world.emplace(entity, new Position);
-    world.emplace(entity, new Velocity);
-    world.emplace(entity, new Freeable);
+    world.create(new Position, new Velocity, new Thing);
 }
 
-// Systems are whatever you want them to be:
+// Here's what a simple system may look like:
 function physics(world) {
-    // Here's how you'd iterate over entities:
-
-    // You call `World.view` with a list of component types.
-    // Then you call `View.each` with a callback.
     world.view(Position, Velocity).each((entity, position, velocity) => {
-        // You've got access to the entity's components here, go wild!
         position.x += velocity.x;
         position.y += velocity.y;
-
-        // You can even modify components which you didn't query for at this point
-        // For example, check for the presence of a component
-        if (world.has(entity, Thing)) {
-            // Then retrieve it,
-            const thing = world.get(entity, Thing);
-            // And modify it.
-            thing.value = "hello!";
-        }
-        // Alternatively, do the above in one go:
-        const thing = world.get(entity, Thing);
-        if (thing) thing.value = `modified at ${new Date().toString()}`;
-
-        // And remove the component once you're done with it.
-        // If your component has a `.free` method, you can call it here, too:
-        world.remove(entity, Thing)?.free();
-        // It won't be called for you, because there are cases where you don't
-        // want to call `.free` on a removed component.
-
-        // If you call `World.destroy`, `.free` will be called
-        // on each component that has it:
-        world.destroy(entity);
-
-        // The return type of the view callback is `false | void`.
-        // To stop the view iteration early, you can return `false`.
-        // If you don't return anything, it continues on.
-        return false;
     });
 }
 ```
 
-To see an actual example, visit the [docs](./docs).
+Here are the core concepts of the library:
+
+**Entity:** an opaque identifier. Entities are used to retrieve components from storage - simply put, it's an array index.
+**Component:** - some state. Components store all your data. In *μECS*, components are plain ES6 classes.
+**System:** - some logic. Systems house your game rules. It's a bit of code which accesses some entities and components, modifies them, creates new ones, destroys them, and so on.
+**World:** - a container. It manages entity and component lifetimes and allows you to flexibly and efficiently utilise them.
+**View:** - a query. A non-owning container of components. They are what makes this library fast.
+
+Every part of the API surface is thoroughly documented, together with comprehensive examples.
+
+To see more complex examples, visit the [documentation](./docs).
 
 You can see the library being used in an actual game [here](https://github.com/EverCrawl/game/blob/master/client/src/core/game/System.ts).
 
 #### Advanced usage
+
+**Inserting entities**
+```ts
+import { World, Tag, Component } from "uecs";
+
+// Insert an entity with a specific ID
+
+// This is useful for serialization or networking,
+// where you don't want the entity IDs to change
+// across different runs or machines.
+
+let world = new World;
+world.insert(10);
+```
 
 **Tags**
 ```ts
@@ -117,21 +96,6 @@ world.create(Tag.for("Enemy"));
 // And you use it the same way when creating views:
 world.view(Tag.for("Enemy")).each((entity) => { /* ... */ });
 world.view(Tag.for("Player")).each((entity) => { /* ... */ });
-```
-
-**Inserting entities**
-```ts
-import { World, Tag, Component } from "uecs";
-
-// Insert an entity with a specific ID
-
-// This is useful for serialization or networking,
-// where you don't want the entity IDs to change
-// across different runs or machines.
-
-let world = new World;
-world.insert(10);
-
 ```
 
 **Simple serialization**
@@ -169,8 +133,8 @@ for (const entity of Object.keys(deserialized)) {
     world.insert(parseInt(entity), ...components);
 }
 
-world.size() // 100
-world.get(10, Thing) // Thing { value: "entity10" }
+world.size(); // 100
+world.get(10, Thing); // Thing { value: "entity10" }
 ```
 
 Missing examples:
@@ -180,11 +144,11 @@ Missing examples:
 
 ### Benchmark
 
-Inspired by [ecs_benchmark](https://github.com/abeimler/ecs_benchmark), which benchmarks C++ libraries.
+Inspired by [ecs_benchmark](https://github.com/abeimler/ecs_benchmark), which is a performance comparison of many C++ ECS libraries.
 
 The benchmark is available [here](https://jsbench.me/1hkl8hiyqh/1). It attempts to update the state of 100k entities. 
 
-The update includes doing things like allocating strings, generating random numbers, branching (if statements), and more. It attemps to reflect a *real world* scenario, but it's incredibly difficult to do so.
+The update includes doing things like allocating strings, generating random numbers, branching (if statements), and more. It attemps to reflect a *real world* scenario.
 
 The op/s number is the same as the FPS counter in games. The example is a bit contrived, because you would probably have a hard time finding a scenario where you'd need to put 100k entities into your game. Nevertheless, this library can probably handle it.
 
