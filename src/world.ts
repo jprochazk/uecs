@@ -68,7 +68,7 @@ export class World {
     }
 
     /**
-     * Returns true if `entity` is in the world
+     * Returns true if `entity` exists in this World
      */
     exists(entity: Entity): boolean {
         return this.entities.has(entity);
@@ -99,6 +99,8 @@ export class World {
 
     /**
      * Retrieves component of type `type` for `entity`
+     * 
+     * @throws If `entity` does not exist
      * 
      * Example:
      * ```
@@ -145,6 +147,8 @@ export class World {
     /**
      * Sets `entity`'s instance of component `type` to `component`.
      * 
+     * @throws If `entity` does not exist
+     * 
      * **Warning:** Overwrites any existing instance of the component!
      * This is to avoid an unnecessary check in 99% of cases where the
      * entity does not have the component yet. Use `world.has` to 
@@ -172,6 +176,8 @@ export class World {
     /**
      * Removes instance of `component` from `entity`, and returns the removed component,
      * or `undefined` if nothing was removed.
+     * 
+     * @throws If `entity` does not exist
      * 
      * Example:
      * ```
