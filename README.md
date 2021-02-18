@@ -2,8 +2,8 @@
 
 It is:
 * 🏋️ **Lightweight**, ~4kb unpacked
-* ⚡ [**High performance**](#benchmark)
 * 💻 [**Easy to use**](#usage)
+* ⚡ [**Extremely fast**](#benchmark)
 
 ### What is ECS?
 
@@ -11,13 +11,9 @@ It is:
 
 In fact, because it is so efficient and makes your code so much easier to reason about, most games, from small indie games, all the way to custom-engine AAA titles, utilize some variation of ECS.
 
-### Comparison
+### Usage
 
 The main advantage of using *μECS* over others is the vastly improved ergonomics - you don't need to register anything ahead of time, not even queries (called *views* in *μECS*).
-
-It's also quite easy to build more complex features on top of *μECS*, such as deferred destruction, component pooling, or serialization, as you'll see further below.
-
-### Usage
 
 Starting with a simple example, this is how you'd update the position of some entities:
 
@@ -150,18 +146,13 @@ world.size(); // 100
 world.get(10, Thing); // Thing { value: "entity10" }
 ```
 
-Missing examples:
-* Deferred entity destruction
-* Component pooling
-* Resource management
-
 ### Benchmark
 
-**μECS** is consistently one of the fastest ECS libraries available, according to [this benchmark](https://github.com/jprochazk/js-ecs-benchmarks).
+**μECS** is consistently one of the fastest ECS libraries available, according to [this benchmark](https://github.com/jprochazk/js-ecs-benchmarks). *μECS* truly shines in iteration, it surpasses the second best performer, perform-ecs, by about 20%.
 
 To run the benchmark, simply `git clone` the repo, `npm install` and `npm run start`.
 
-* This benchmark is a fork of [this one](https://github.com/ddmills/js-ecs-benchmarks), where my library is currently awaiting approval.
+This benchmark is a fork of [this one](https://github.com/ddmills/js-ecs-benchmarks), where the PR for my library is awaiting approval.
 
 ### Notes
 

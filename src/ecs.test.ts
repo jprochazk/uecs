@@ -155,6 +155,16 @@ describe("ECS", function () {
 
         expect(count).toEqual(world.size());
     });
+
+    it("view doesn't throw on unknown components", function () {
+        class A { }
+        const world = new World;
+        for (let i = 0; i < 100; ++i) {
+            world.create();
+        }
+
+        expect(() => world.view(A).each(() => { })).not.toThrow();
+    });
 });
 
 describe("ECS examples", function () {

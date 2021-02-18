@@ -109,7 +109,8 @@ export class World {
      */
     destroy(entity: Entity) {
         this.entities.delete(entity);
-        for (const storage of Object.values(this.components)) {
+        for (const key in this.components) {
+            const storage = this.components[key];
             const component = storage[entity];
             if (component !== undefined && component.free !== undefined) component.free();
             delete storage[entity];
@@ -246,7 +247,7 @@ export class World {
         }
 
         const storage = this.components[type];
-        if (storage == null) return undefined;
+        if (storage === undefined) return undefined;
         const out = this.components[type][entity] as T | undefined;
         delete this.components[type][entity];
         return out;
@@ -290,6 +291,12 @@ export class World {
             id += types[i].name;
         }
         if (this.views[id] == null) {
+            // ensure that never-before seen types are registered.
+            for (let i = 0; i < types.length; ++i) {
+                if (this.components[types[i].name] === undefined) {
+                    this.components[types[i].name] = {};
+                }
+            }
             this.views[id] = new View(this, generateView(types));
         }
         return this.views[id];
