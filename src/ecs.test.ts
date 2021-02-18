@@ -73,6 +73,15 @@ describe("ECS", function () {
         expect(world.has(entity, A)).toBeTruthy();
     });
 
+    it("removes tag", function () {
+        const world = new World;
+        const entity = world.create(Tag.for("A"));
+        expect(world.has(entity, Tag.for("A"))).toBeTruthy();
+        expect(world.remove(entity, Tag.for("A"))).not.toBeUndefined();
+        expect(world.has(entity, Tag.for("A"))).toBeFalsy();
+
+    });
+
     it("destroys entity without free", function () {
         const world = new World;
 

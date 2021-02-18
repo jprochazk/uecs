@@ -13,53 +13,68 @@ In fact, because it is so efficient and makes your code so much easier to reason
 
 ### About the library
 
-*μECS* tries to stay unopinionated. Where most ECS libraries act more like engines, dictating how you should structure and run your code, here you'll find only a very efficient storage for your entities and components. How you actually structure your game is entirely up to you.
+*μECS* is unopinionated. Where most ECS libraries act more like engines, dictating how you should structure and run your code, here you'll find only a very efficient storage for your entities and components.
 
-To stay lean and mean, things like deferred entity destruction, resource management, component pooling, and so on, are not part of the library. It means there is more work for you, the user, but it also means there is far more flexibility for *every* user's specific requirements. Rest assured, using the library doesn't require an exorbitant amount of work. Quite the opposite, it's very straightforward. You can see examples of advanced usage [further down](#advanced-usage).
+The main advantage of using *μECS* over others is the vastly improved ergonomics - you don't need to register anything ahead of time, not even queries (called *views* in *μECS*). 
+
+It's also quite easy to build more complex features on top of *μECS*, such as deferred destruction, component pooling, or serialization, as you'll see further below.
 
 ### Usage
 
-To best illustrate the usage of this library, here's some code:
+Starting with a simple example, this is how you'd update the position of some entities:
 
 ```ts
 import { World } from 'uecs';
 
-// Create some components
+// Create some components - Plain classes!
 class Position { x = 0; y = 0 }
 class Velocity { x = 10; y = 10 }
-class Thing {
-    value = "test";
-    free() { console.log("freed"); }
-}
 
-// Create a `World` and add some entities
+// Instantiate a World
 const world = new World;
+// And add some entities
 for (let i = 0; i < 100; ++i) {
-    world.create(new Position, new Velocity, new Thing);
+    // Give each entity a Position and Velocity component
+    world.create(new Position, new Velocity);
 }
 
-// Here's what a simple system may look like:
-function physics(world) {
-    world.view(Position, Velocity).each((entity, position, velocity) => {
-        position.x += velocity.x;
-        position.y += velocity.y;
+// And here is our system, it can be anything we want it to be.
+// In this case, it's a plain function, which views entities
+// with `Position` and `Velocity` components.
+const physics = (world, dt) => world
+    .view(Position, Velocity)
+    .each((entity, position, velocity) => {
+        // Liftoff!
+        position.x += velocity.x * dt;
+        position.y += velocity.y * dt;
     });
+
+const TARGET_MS = 1000 / 60;
+let last = window.performance.now();
+const loop = (now) => {
+    let dt = (now - last) / TARGET_MS;
+    last = now;
+
+    physics(world, dt);
+    // ... collisions, drawing, AI, etc.
+    // go wild!
+
+    requestAnimationFrame(loop);
 }
+requestAnimationFrame(loop);
 ```
 
 Here are the core concepts of the library:
 
-* **Entity:** an opaque identifier. Entities are used to retrieve components from storage - simply put, it's an array index.
-* **Component:** - some state. Components store all your data. In *μECS*, components are plain ES6 classes.
-* **System:** - some logic. Systems house your game rules. It's a bit of code which accesses some entities and components, modifies them, creates new ones, destroys them, and so on.
-* **World:** - a container. It manages entity and component lifetimes and allows you to flexibly and efficiently utilise them.
-* **View:** - a query. A non-owning container of components. They are what makes this library fast.
+* **Entity:** - A container for components.
+* **Component:** - Some data.
+* **System:** - Some logic.
+* **World:** - A container for entities.
+* **View:** - A component *combination* iterator.
 
-Every part of the API surface is thoroughly documented, together with comprehensive examples.
+Visit the [this page](https://www.jan-prochazka.eu/uecs/) to see the auto-generated documentation, and some examples.
 
-To see more complex examples, visit the [documentation](./docs).
-
-You can see the library being used in an actual game [here](https://github.com/EverCrawl/game/blob/master/client/src/core/game/System.ts).
+You can see the library being used in an actual game [here](https://github.com/EverCrawl/game/tree/master/client).
 
 #### Advanced usage
 
@@ -144,19 +159,4 @@ Missing examples:
 
 ### Benchmark
 
-Inspired by [ecs_benchmark](https://github.com/abeimler/ecs_benchmark), which is a performance comparison of many C++ ECS libraries.
-
-The benchmark is available [here](https://jsbench.me/1hkl8hiyqh/1). It attempts to update the state of 100k entities. 
-
-The update includes doing things like allocating strings, generating random numbers, branching (if statements), and more. It attemps to reflect a *real world* scenario.
-
-The op/s number is the same as the FPS counter in games. The example is a bit contrived, because you would probably have a hard time finding a scenario where you'd need to put 100k entities into your game. Nevertheless, this library can probably handle it.
-
-On my machine, the results are:
-
-| CPU                 | browser | operations |
-|:--------------------|:--------|:----------:|
-| i5-8600K @ 3.60 GHz | Firefox | ~55/s      |
-| i5-8600K @ 3.60 GHz | Chrome  | ~108/s     |
-
-More extensive benchmarks for things such as creating/deleting entities, adding/removing components coming soon.
+**μECS** is consistently the fastest ECS library available, according to [js-ecs-benchmarks](https://github.com/ddmills/js-ecs-benchmarks).
