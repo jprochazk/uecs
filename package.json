@@ -1,6 +1,6 @@
 {
     "name": "uecs",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "description": "Micro ECS",
     "author": "Jan Procházka",
     "license": "MIT",
