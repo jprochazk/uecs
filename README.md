@@ -1,8 +1,8 @@
 **μECS** is an [ECS](#what-is-ecs) library.
 
 It is:
-* 🏋️ **Lightweight**: Less than 4kb unpacked
-* ⚡ [**Really fast**](#benchmark)
+* 🏋️ **Lightweight**, ~4kb unpacked
+* ⚡ [**Fastest in the land**](#benchmark)
 * 💻 [**Easy to use**](#usage)
 
 ### What is ECS?
@@ -11,11 +11,9 @@ It is:
 
 In fact, because it is so efficient and makes your code so much easier to reason about, most games, from small indie games, all the way to custom-engine AAA titles, utilize some variation of ECS.
 
-### About the library
+### Comparison
 
-*μECS* is unopinionated. Where most ECS libraries act more like engines, dictating how you should structure and run your code, here you'll find only a very efficient storage for your entities and components.
-
-The main advantage of using *μECS* over others is the vastly improved ergonomics - you don't need to register anything ahead of time, not even queries (called *views* in *μECS*). 
+The main advantage of using *μECS* over others is the vastly improved ergonomics - you don't need to register anything ahead of time, not even queries (called *views* in *μECS*).
 
 It's also quite easy to build more complex features on top of *μECS*, such as deferred destruction, component pooling, or serialization, as you'll see further below.
 
@@ -159,4 +157,12 @@ Missing examples:
 
 ### Benchmark
 
-**μECS** is consistently the fastest ECS library available, according to [js-ecs-benchmarks](https://github.com/ddmills/js-ecs-benchmarks).
+**μECS** is consistently the fastest ECS library available, according to these benchmarks:
+* [js-ecs-benchmarks](https://github.com/ddmills/js-ecs-benchmarks)
+
+
+### Notes
+
+Even though the version currently does not have a major version (following semver), the API should be considered stable. The library is most likely feature-complete.
+
+The reason for this is that I've been working on this library for many months, using it in my game project. I've decided I want to be able to re-use it in my other projects, so I created a repository for it and put it on NPM.
