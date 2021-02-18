@@ -157,8 +157,7 @@ Missing examples:
 
 ### Benchmark
 
-**μECS** is consistently the fastest ECS library available, according to these benchmarks:
-* [js-ecs-benchmarks](https://github.com/ddmills/js-ecs-benchmarks)
+**μECS** is consistently the fastest ECS library available, according to [this benchmark](https://github.com/jprochazk/js-ecs-benchmarks). It's a fork of [this one](https://github.com/ddmills/js-ecs-benchmarks), where my library is currently awaiting approval.
 
 
 ### Notes
