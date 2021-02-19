@@ -165,6 +165,13 @@ describe("ECS", function () {
 
         expect(() => world.view(A).each(() => { })).not.toThrow();
     });
+
+    it("insert does not break sequence", function () {
+        const world = new World;
+
+        world.insert(100);
+        expect(world.create()).toEqual(101);
+    })
 });
 
 describe("ECS examples", function () {

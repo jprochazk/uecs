@@ -19,12 +19,27 @@
                 width: 100vw;
                 height: 100vh;
             }
+
+            div#controls {
+                position: absolute;
+                top: 5vh;
+                left: 5vw;
+                z-index: 1000;
+                width: auto;
+                height: auto;
+                background: none;
+                color: white;
+            }
         </style>
         <script src="https://unpkg.com/uecs@latest/dist/index.umd.js"></script>
     </head>
     <body>
         <canvas id="game">Canvas is not supported in your browser.</canvas>
         <noscript>JavaScript is required to view the example.</noscript>
+        <div id="controls">
+            Press WASD to move the Square entity.<br>
+            The AI walk/stops at random intervals, and it reverses direction upon hitting a wall.
+        </div>
         <script>
             // some randomizers to spice things up
             function randomInt(min, max) {
@@ -93,17 +108,16 @@
             // these will be controlled by a simple state machine
             for (let i = 0; i < 100; ++i) {
                 let radius = randomInt(8, 32);
+                let x = randomInt(radius, window.innerWidth - radius);
+                let y = randomInt(radius, window.innerHeight - radius);
                 world.create(
-                    new Position(
-                        randomInt(radius, window.innerWidth - radius), 
-                        randomInt(radius, window.innerHeight - radius)),
+                    new Position(x, y),
                     new Velocity,
                     new Body("circle", randomRGB(), radius),
                     new AI
                 )
             }
 
-            // setup input
             let keys = {};
             window.addEventListener("keydown", e => keys[e.code] = true);
             window.addEventListener("keyup", e => keys[e.code] = false);
@@ -118,8 +132,6 @@
                 if (keys["KeyD"]) velocity.x += 1;
             }
 
-            // and here are our systems- there are *ZERO* requirements for them.
-            // i'm choosing to have my systems be plain functions which accept a `world` instance.
             function ai(world) {
                 const now = Date.now();
 
