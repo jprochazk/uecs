@@ -115,7 +115,7 @@ world.view(A, B, C).each((entity, a, b, c) => {
 ```
 Iteration works by creating a non-owning `View` into the `World`. You pass a callback to `View.each`, which iterates over all entities matching the criteria, and calls the callback with each entity and combination of components you queried for. It's safe to emplace or remove components from the entity inside the callback body.
 
-Be careful about creating new entities, though. A `View` is lazy, which means it fetches the entity and component data only when it needs to. If you create an entity with the same archetype as the one you're currently iterating over, it will appear at some point during the iteration:
+Be careful about creating new entities, though. A `View` is lazy, which means that it fetches the entity and component data only when it needs to. If you create an entity with the same archetype as the one you're currently iterating over, it will appear at some point during the iteration:
 ```ts
 const Test { constructor(value) { this.value = value; } }
 const world = new World;
@@ -155,7 +155,7 @@ world.view(Test, Position, Discombobulator).each((entity, test, pos, db) => {
 
 ### Tags
 
-This library also provides a simple tagging mechanism. Tags are empty, unique components that can be used to attach additional identification information to entitites:
+This library also provides a simple tagging mechanism. Tags are empty, unique components that can be used to attach additional ID info to entitites:
 ```ts
 import { World, Tag } from "uecs";
 
@@ -175,11 +175,11 @@ for (let i = 0; i < 50; ++i) {
 world.view(Position, Tag.for("Team A")).each((entity, position) => { /* ... */ });
 world.view(Position, Tag.for("Team B")).each((entity, position) => { /* ... */ });
 ```
-They are passed into the callback just like the rest of the components, so I recommend to always put tags last in the `World.view` argument list as that allows you to easily ignore them. The reasoning is again to simplify the code, and improve the performance: It's a lot slower to check if something is a tag or not before passing it to the callback.
+They are passed into the callback just like the rest of the components, so I recommend to always put tags last in the `World.view` argument list as that allows you to easily ignore them. The reasoning is again to simplify the code and improve performance: It's a lot slower to check if something is a tag or not before passing it to the callback.
 
 ### That's it!
 
-Congratulations, you've now seen the entire API! Try it out, see if you like it. If you don't, [submit an issue](https://github.com/jprochazk/uecs/issues), and let me know what could be improved, if some important functionality is missing, or if something is broken.
+Congratulations, you've now seen the entire API! Try it out, see if you like it. If you don't, [open an issue](https://github.com/jprochazk/uecs/issues), and let me know what could be improved, if some important functionality is missing, or if anything is broken.
 
 ### Documentation
 
