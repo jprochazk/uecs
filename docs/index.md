@@ -1,7 +1,27 @@
 
-### World API
+After reading through this page, you'll be able to understand what's happening in this code snippet:
+```ts
+import { World } from 'uecs';
 
-The constructor takes no parameters:
+class Position { x = 0; y = 0 }
+class Velocity { x = 10; y = 10 }
+
+const world = new World;
+for (let i = 0; i < 100; ++i) {
+    world.create(new Position, new Velocity);
+}
+
+function physics(world, dt) {
+    world.view(Position, Velocity).each((entity, position, velocity) => {
+        position.x += velocity.x * dt;
+        position.y += velocity.y * dt;
+    });
+}
+```
+
+### World
+
+Everything revolves around a `World` instance. The `World` stores your entities, and their components.
 ```ts
 const world = new World;
 ```
@@ -19,7 +39,6 @@ const entity = world.create();
 ```
 And destroy them:
 ```ts
-const entity = 0;
 world.destroy(entity);
 ```
 When you destroy an entity, all of its components are destroyed, too. If you component has a `.free()` method, this method will be called:
@@ -31,14 +50,12 @@ world.destroy(entity); // logs "freed!"
 
 You can also insert a specific entity ID:
 ```ts
-const entity = 10;
 world.insert(entity);
 ```
 Which is useful for when you're receiving entities from a server, or reading them from a file.
 
 Here is how to check if an entity exists:
 ```ts
-const entity = 10;
 if (world.exists(entity)) {
     // ...
 }
@@ -87,7 +104,7 @@ Here's how you remove a component:
 ```ts
 world.remove(entity, MyComponent);
 ```
-It accepts the class directly, instead of a string name or component ID, making the API concise.
+It accepts the class directly, instead of a string name or component ID.
 
 `World.remove` returns the removed component, as well:
 ```ts
@@ -107,15 +124,17 @@ const component = world.get(entity, MyComponent);
 ```
 If the entity doesn't exist, or it doesn't have the component, `World.get` returns `undefined`, similarly to `World.remove`.
 
-Finally, we get to to one of the main highlights of the library - world views and fast iteration:
+Finally, we get to to one the main highlight of *μECS* - fast iteration:
 ```ts
 world.view(A, B, C).each((entity, a, b, c) => {
     // do something with the entity and components
 });
 ```
-Iteration works by creating a non-owning `View` into the `World`. You pass a callback to `View.each`, which iterates over all entities matching the criteria, and calls the callback with each entity and combination of components you queried for. It's safe to emplace or remove components from the entity inside the callback body.
+Iteration works by creating a non-owning `View` into the `World`. You pass a callback to `View.each`, which iterates over all entities matching the criteria, and calls the callback with each entity and the combination of components you queried for. 
 
-Be careful about creating new entities, though. A `View` is lazy, which means that it fetches the entity and component data only when it needs to. If you create an entity with the same archetype as the one you're currently iterating over, it will appear at some point during the iteration:
+While it's safe to emplace or remove components from the entity inside the callback body, be careful about creating new entities. A `View` is lazy, which means that it fetches the entity and component data only when it needs to. 
+
+For example, if you create an entity with the same archetype as the one you're currently iterating over, it will be fetched at a later time:
 ```ts
 const Test { constructor(value) { this.value = value; } }
 const world = new World;
@@ -175,7 +194,13 @@ for (let i = 0; i < 50; ++i) {
 world.view(Position, Tag.for("Team A")).each((entity, position) => { /* ... */ });
 world.view(Position, Tag.for("Team B")).each((entity, position) => { /* ... */ });
 ```
-They are passed into the callback just like the rest of the components, so I recommend to always put tags last in the `World.view` argument list as that allows you to easily ignore them. The reasoning is again to simplify the code and improve performance: It's a lot slower to check if something is a tag or not before passing it to the callback.
+They are passed into the callback just like the rest of the components:
+```ts
+world.view(Position, Tag.for("Team A")).each((entity, position, tag) => {
+    console.log(tag); // not undefined, but useless
+})
+```
+The reasoning for this behavior is to simplify the code and improve performance: Treating tags in a special way would slow down the whole code base, increase memory usage, make the library larger, and so on, with minimal benefit. You should put tags last in the `World.view` argument list, as that allows you to easily ignore them.
 
 ### That's it!
 

@@ -42,7 +42,7 @@ Here are the core concepts of the library:
 
 In *μECS*, components are stored in arrays, and entities are used as the index. Systems are whatever you want them to be, because you can construct views at any time, which allow you to efficiently iterate over entities with a specific combination of components, commonly referred to as an *archetype*.
 
-Visit the [this page](https://www.jan-prochazka.eu/uecs/) to see a full walk-through of the entire API, auto-generated documentation (which contains more examples and API explanations), as well as a simple demo!
+Visit the [this page](https://jprochazk.github.io/uecs/) to see a full walk-through of the entire API, auto-generated documentation (which contains more examples and API explanations), as well as a simple demo!
 
 ### Benchmark
 
