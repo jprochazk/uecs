@@ -171,7 +171,11 @@ describe("ECS", function () {
 
         world.insert(100);
         expect(world.create()).toEqual(101);
-    })
+        world.insert(99);
+        expect(world.create()).toEqual(102);
+        world.insert(200);
+        expect(world.create()).toEqual(201);
+    });
 });
 
 describe("ECS examples", function () {
