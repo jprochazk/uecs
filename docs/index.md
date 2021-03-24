@@ -136,7 +136,7 @@ While it's safe to emplace or remove components from the entity inside the callb
 
 For example, if you create an entity with the same archetype as the one you're currently iterating over, it will be fetched at a later time:
 ```ts
-const Test { constructor(value) { this.value = value; } }
+class Test { constructor(value) { this.value = value; } }
 const world = new World;
 world.create(new Test("A"));
 world.view(Test).each((entity, test) => {
