@@ -1,4 +1,7 @@
 <script src="https://unpkg.com/uecs@latest"></script>
+<script>
+const { World, Null, Tag } = uECS;
+</script>
 
 After reading through this page, you'll be able to understand what's happening in this code snippet:
 ```ts
