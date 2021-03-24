@@ -32,6 +32,26 @@ describe("ECS", function () {
 
         const entity = world.create(Tag.for("Test"));
         expect(world.has(entity, Tag.for("Test"))).toBeTruthy();
+        expect(world.has(entity, Tag.for("NotTest"))).toBeFalsy();
+    });
+
+    it("creates entity with enum tags", function () {
+        enum TagId { A, B }
+        const world = new World;
+
+        const entity = world.create(Tag.for(TagId.A));
+        expect(world.has(entity, Tag.for(TagId.A))).toBeTruthy();
+        expect(world.has(entity, Tag.for(TagId.B))).toBeFalsy();
+    });
+
+    it("creates entity with object tags", function () {
+        const TagA = { toString() { return "A" } };
+        const TagB = { toString() { return "B" } };
+        const world = new World;
+
+        const entity = world.create(Tag.for(TagA));
+        expect(world.has(entity, Tag.for(TagA))).toBeTruthy();
+        expect(world.has(entity, Tag.for(TagB))).toBeFalsy();
     });
 
     it("inserts empty entity", function () {
@@ -176,6 +196,18 @@ describe("ECS", function () {
         world.insert(200);
         expect(world.create()).toEqual(201);
     });
+
+    it("view doesn't loop infinitely", function () {
+        const world = new World;
+        world.create(A);
+        // creates six new entities
+        world.view(A).each((e) => {
+            // base case
+            if (e > 5) return false;
+            world.create(A);
+        });
+        expect(world.size()).toEqual(7);
+    });
 });
 
 describe("ECS examples", function () {
@@ -265,6 +297,20 @@ describe("ECS examples", function () {
             result.push(n);
         });
         expect(result).toEqual([0, 15])
+    });
+
+    it(".view example return false", function () {
+        class Test { constructor(public value: number) { } }
+        const world = new World;
+        for (let i = 0; i < 100; ++i) world.create(new Test(i));
+        let count = 0;
+        world.view(Test).each((entity, test) => {
+            if (test.value === 50) {
+                return false;
+            }
+            count += 1;
+        });
+        expect(count).toEqual(50);
     });
 
 });

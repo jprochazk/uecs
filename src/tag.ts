@@ -1,7 +1,8 @@
-
 import { Constructor } from "./util";
 
-export interface EntityTag<Name extends string> {
+type TagName = string | number | { toString(): string; };
+
+export interface EntityTag<Name extends TagName> {
     /**
      * Don't try to use this, it only exists to preserve the type parameter.
      */
@@ -28,11 +29,12 @@ export abstract class Tag {
      *  registry.view(Tag.for("Player")).each(() => { ... });
      * ```
      */
-    static for<Name extends string>(name: Name): Constructor<EntityTag<Name>> {
-        let t = Tag.cache[name]
+    static for<Name extends TagName>(name: Name): Constructor<EntityTag<Name>> {
+        const n = name.toString();
+        let t = Tag.cache[n]
         if (t == null) {
-            t = Object.defineProperty(class { }, "name", { value: `T$${name}` });
-            Tag.cache[name] = t;
+            t = Object.defineProperty(class { }, "name", { value: "T$" + n });
+            Tag.cache[n] = t;
         }
         return t;
     }

@@ -124,30 +124,41 @@ const component = world.get(entity, MyComponent);
 ```
 If the entity doesn't exist, or it doesn't have the component, `World.get` returns `undefined`, similarly to `World.remove`.
 
-Finally, we get to to one of the main highlight of *μECS* - fast iteration:
+Finally, we get to the main highlight of *μECS* - iteration:
 ```ts
 world.view(A, B, C).each((entity, a, b, c) => {
     // do something with the entity and components
 });
 ```
-Iteration works by creating a non-owning `View` into the `World`. You pass a callback to `View.each`, which iterates over all entities matching the criteria, and calls the callback with each entity and the combination of components you queried for. 
+Iteration works by creating a `View` into the `World`. You pass a callback to `View.each`, which iterates over all entities matching the criteria, and calls the callback with each entity and the combination of components you queried for.
 
-While it's safe to emplace or remove components from the entity inside the callback body, be careful about creating new entities. A `View` is lazy, which means that it fetches the entity and component data only when it needs to. 
-
-For example, if you create an entity with the same archetype as the one you're currently iterating over, it will be fetched at a later time:
+It's possible to halt the iteration early by returning `false` from the callback:
 ```ts
-class Test { constructor(value) { this.value = value; } }
+class Test { constructor(value) { this.value = value } }
 const world = new World;
-world.create(new Test("A"));
+for (let i = 0; i < 100; ++i) world.create(new Test(i));
+let count = 0;
 world.view(Test).each((entity, test) => {
-    if (test.value === "B") {
-        console.log("Found it.");
+    if (test.value === 50) {
+        return false;
     }
+    count += 1;
+});
+console.log(count); // logs "50", even though we have 100 entities
+```
 
-    world.create(new Test("B"));
+A `View` is lazy, which means that it fetches the entity and component data only just before it's passed into the callback. While it's safe to emplace or remove components from the entity inside the callback body, be careful about creating new entities.
+
+For example, if you create an entity with the same archetype as the one you're currently iterating over, it will be fetched at a later time, possibly causing an infinite loop!
+```ts
+class Test { }
+const world = new World;
+world.create(new Test);
+world.view(Test).each((entity, test) => {
+    world.create(new Test);
 });
 ```
-The above example will log `"Found it."` in the console.
+If you try to run the above example, it will freeze your tab.
 
 Views utilize TypeScript variadic tuple types, so the types inside the callback are properly known:
 ```ts

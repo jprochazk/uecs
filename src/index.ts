@@ -1,2 +1,2 @@
-export { Entity, Null, Component, World } from "./world"
+export { Entity, Null, Component, World, View, ViewCallback } from "./world"
 export { Tag, EntityTag } from "./tag";
