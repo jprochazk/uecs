@@ -11,6 +11,8 @@ It is:
 
 ### Usage
 
+Visit the [this page](https://jprochazk.github.io/uecs/) to see a full walk-through of the entire API, auto-generated documentation (which contains more examples and API explanations), as well as a simple demo!
+
 The main advantage of using *μECS* over other libraries is the vastly improved ergonomics - you don't need to register anything ahead of time. You can take full advantage of JS being a dynamic language, all while maintaining [great performance](#benchmark).
 
 ```ts
@@ -41,8 +43,6 @@ Here are the core concepts of the library:
 * **View:** - A component iterator.
 
 In *μECS*, components are stored in arrays, and entities are used as the index. Systems are whatever you want them to be, because you can construct views at any time, which allow you to efficiently iterate over entities with a specific combination of components, commonly referred to as an *archetype*.
-
-Visit the [this page](https://jprochazk.github.io/uecs/) to see a full walk-through of the entire API, auto-generated documentation (which contains more examples and API explanations), as well as a simple demo!
 
 ### Benchmark
 
