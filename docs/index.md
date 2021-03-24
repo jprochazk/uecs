@@ -41,7 +41,7 @@ And destroy them:
 ```ts
 world.destroy(entity);
 ```
-When you destroy an entity, all of its components are destroyed, too. If you component has a `.free()` method, this method will be called:
+When you destroy an entity, all of its components are destroyed, too. If your component has a `.free()` method, this method will be called:
 ```ts
 class Test { free() { console.log("freed!") } }
 const entity = world.create(new Test);
@@ -93,7 +93,7 @@ The above is quite verbose, and there is a better way:
 ```ts
 const entity = world.create(new MyComponent);
 ```
-`World.create` optionally takes a variable amount or arguments, each being a component instance. When the entity is created, all the components are automatically emplaced onto it.
+`World.create` optionally takes a variable amount of arguments, each being a component instance. When the entity is created, all the components are automatically emplaced onto it.
 
 `World.insert` is consistent with `World.create`, and takes a variable amount of component instances:
 ```ts
@@ -124,7 +124,7 @@ const component = world.get(entity, MyComponent);
 ```
 If the entity doesn't exist, or it doesn't have the component, `World.get` returns `undefined`, similarly to `World.remove`.
 
-Finally, we get to to one the main highlight of *μECS* - fast iteration:
+Finally, we get to to one of the main highlight of *μECS* - fast iteration:
 ```ts
 world.view(A, B, C).each((entity, a, b, c) => {
     // do something with the entity and components
