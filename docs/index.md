@@ -20,6 +20,8 @@ function physics(world, dt) {
 }
 ```
 
+The library is imported on this page, so you can try running some of this code in the developer console.
+
 ### World
 
 Everything revolves around a `World` instance. The `World` stores your entities, and their components.
