@@ -1,3 +1,4 @@
+<script src="https://unpkg.com/uecs@latest"></script>
 
 After reading through this page, you'll be able to understand what's happening in this code snippet:
 ```ts
