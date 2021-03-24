@@ -5,6 +5,8 @@ It is:
 * 💻 [**Easy to use**](#usage)
 * ⚡ [**Extremely fast**](#benchmark)
 
+**μECS** is available on [NPM](https://www.npmjs.com/package/uecs) and the [unpkg](https://unpkg.com/uecs@latest) CDN, for use in both browsers and Node.
+
 ### What is ECS?
 
 **E**ntity **C**omponent **S**ystem is an architectural pattern. It it used to decouple a game's state from its logic. It also boasts *extremely* fast performance when dealing with large amounts of objects. Many games, from indie to AAA titles, utilise some form of ECS.
