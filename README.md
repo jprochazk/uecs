@@ -9,19 +9,19 @@ It is:
 
 ### What is ECS?
 
-**E**ntity **C**omponent **S**ystem is an architectural pattern. It it used to decouple a game's state from its logic. It also boasts *extremely* fast performance when dealing with large amounts of objects. Many games, from indie to AAA titles, utilise some form of ECS.
+**E**ntity **C**omponent **S**ystem is an architectural pattern. It it used to decouple a game's state from its logic, which makes reasoning about your game much easier. Instead of a complex game object hierarchy, you're left with *components*, composed into *entities*, all living in a shared *world*, manipulated by *systems*. It has the additional benefit of performing well on modern CPUs, due to being [data oriented](https://en.wikipedia.org/wiki/Data-oriented_design).
+
+For a proper introduction to what ECS is, what it's aiming to fix and how it works, I recommend reading [this series of articles](http://t-machine.org/index.php/2007/11/11/entity-systems-are-the-future-of-mmog-development-part-2/).
 
 ### Usage
 
-Visit the [this page](https://jprochazk.github.io/uecs/) to see a full walk-through of the entire API, auto-generated documentation (which contains more examples and API explanations), as well as a simple demo!
-
-The main advantage of using *μECS* over other libraries is the vastly improved ergonomics - you don't need to register anything ahead of time. You can take full advantage of JS being a dynamic language, all while maintaining [great performance](#benchmark).
+Visit the [this page](https://uecs.jan-prochazka.eu/) to see a full walk-through of the entire API, auto-generated documentation (which contains more examples and API explanations), as well as a simple demo!
 
 ```ts
 import { World } from 'uecs';
 
-class Position { x = 0; y = 0 }
-class Velocity { x = 10; y = 10 }
+class Position { x = 0; y = 0; }
+class Velocity { x = 10; y = 10; }
 
 const world = new World;
 for (let i = 0; i < 100; ++i) {
@@ -36,19 +36,9 @@ function physics(world, dt) {
 }
 ```
 
-Here are the core concepts of the library:
-
-* **Entity:** - A container for components.
-* **Component:** - Some data.
-* **System:** - Some logic.
-* **World:** - A container for entities.
-* **View:** - A component iterator.
-
-In *μECS*, components are stored in arrays, and entities are used as the index. Systems are whatever you want them to be, because you can construct views at any time, which allow you to efficiently iterate over entities with a specific combination of components, commonly referred to as an *archetype*.
-
 ### Benchmark
 
-This library focuses on being small, but without compromising on performance. **μECS** is consistently one of the fastest ECS libraries available, according to [this benchmark](https://github.com/ddmills/js-ecs-benchmarks). *μECS* truly shines in iteration, it surpasses the second best performer, perform-ecs, by roughly 10-20%.
+This library focuses on being small and simple, but without compromising on performance. **μECS** is one of the fastest ECS libraries available, according to [this benchmark](https://github.com/ddmills/js-ecs-benchmarks).
 
 ### Notes
 
