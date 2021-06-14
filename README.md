@@ -1,7 +1,7 @@
 **μECS** is an [ECS](#what-is-ecs) library.
 
 It is:
-* 🏋️ **Lightweight**, ~4kb unpacked
+* 🏋️ **Lightweight**, ~3kb unpacked
 * 💻 [**Easy to use**](#usage)
 * ⚡ [**Extremely fast**](#benchmark)
 

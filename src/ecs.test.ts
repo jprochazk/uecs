@@ -12,7 +12,7 @@ class C { c = 0 }
 //  - world.emplace()
 //  - world.remove()
 
-describe("ECS", function () {
+describe("behavior", function () {
     it("creates empty entity", function () {
         const world = new World;
 
@@ -99,7 +99,13 @@ describe("ECS", function () {
         expect(world.has(entity, Tag.for("A"))).toBeTruthy();
         expect(world.remove(entity, Tag.for("A"))).not.toBeUndefined();
         expect(world.has(entity, Tag.for("A"))).toBeFalsy();
+    });
 
+    it("remove doesn't throw for dead entity", function () {
+        const world = new World;
+
+        const thing = world.remove(0, A);
+        expect(thing).toBeUndefined();
     });
 
     it("destroys entity without free", function () {
@@ -210,7 +216,7 @@ describe("ECS", function () {
     });
 });
 
-describe("ECS examples", function () {
+describe("examples", function () {
     it(".insert example", function () {
         class A { constructor(public value = 0) { } }
         class B { constructor(public value = 0) { } }
