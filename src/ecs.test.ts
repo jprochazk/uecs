@@ -203,6 +203,15 @@ describe("behavior", function () {
         expect(world.create()).toEqual(201);
     });
 
+    it("insert does not break sequence when entity == world.entitySequence", function () {
+        const world = new World;
+
+        const a = world.insert(0);
+        const b = world.create(); // should be 1
+
+        expect(a + 1).toEqual(b);
+    });
+
     it("view doesn't loop infinitely", function () {
         const world = new World;
         world.create(A);

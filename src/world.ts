@@ -82,7 +82,7 @@ export class World {
      */
     insert<T extends Component[]>(entity: Entity, ...components: T): Entity {
         // ensure this doesn't break our entity sequence
-        if (entity > this.entitySequence) this.entitySequence = entity + 1;
+        if (entity >= this.entitySequence) this.entitySequence = entity + 1;
         this.entities.add(entity);
         for (let i = 0, len = components.length; i < len; ++i) {
             this.emplace(entity, components[i]);
