@@ -15,7 +15,7 @@ For a proper introduction to what ECS is, what it's aiming to fix and how it wor
 
 ### Usage
 
-Visit the [this page](https://uecs.jan-prochazka.eu/) to see a full walk-through of the entire API, auto-generated documentation (which contains more examples and API explanations), as well as a simple demo!
+Visit the [this page](https://jan-prochazka.eu/uecs/) to see a full walk-through of the entire API, auto-generated documentation (which contains more examples and API explanations), as well as a simple demo!
 
 ```ts
 import { World } from 'uecs';
