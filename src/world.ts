@@ -418,6 +418,5 @@ function generateView(world: World, types: any[]): ComponentView<any> {
         + "}\n"
         + "}";
 
-        console.log(fn);
     return (new Function(keywords.world, fn))(world) as any;
 }
