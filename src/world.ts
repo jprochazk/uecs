@@ -163,7 +163,7 @@ export class World {
     has<T extends Component>(entity: Entity, component: Constructor<T>): boolean {
         const type = component.name;
         const storage = this.components[type];
-        return storage !== undefined && storage.has(entity) !== undefined;
+        return storage !== undefined && storage.has(entity);
     }
 
     /**
